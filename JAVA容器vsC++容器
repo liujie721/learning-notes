@@ -1,0 +1,15 @@
+Java 容器	     C++ 对应容器	              核心差异
+ArrayList	     vector	             底层都是动态数组，Java 自动扩容
+LinkedList	   list	                    都是双向链表
+HashSet	       unordered_set	        都是哈希表，无序去重
+TreeSet	       set	                  都是红黑树，有序去重
+HashMap	       unordered_map	       都是哈希表，键值对无序
+TreeMap	       map	                 都是红黑树，键值对有序
+LinkedHashMap	 无原生对应（需自定义）	Java 原生支持插入顺序，C++ 需手动实现
+Java 中集合（Set/List/Map）只能存储对象类型（包装类），不能存储基本类型（int/long/char 等）：
+
+
+类型	  获取长度的方式	             示例
+Set集合	size() 方法（带括号）	  ans.size()
+数组	  length 属性（无括号）	  arr.length
+字符串	  length() 方法（带括号）	"abc".length()
