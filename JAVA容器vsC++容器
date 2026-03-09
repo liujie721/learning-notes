@@ -13,3 +13,91 @@ Java 中集合（Set/List/Map）只能存储对象类型（包装类），不能
 Set集合	size() 方法（带括号）	  ans.size()
 数组	  length 属性（无括号）	  arr.length
 字符串	  length() 方法（带括号）	"abc".length()
+
+转数组方法：
+List/Set：直接用 ans.toArray(T[] a) 或手动遍历；
+Map：先转 keySet()/values()/entrySet()，再转数组；
+
+我直接给你最精简、刷题必背、一看就会的
+HashMap 三剑客：computeIfAbsent + computeIfPresent + merge
+ 
+
+
+ 
+1. computeIfAbsent
+ 
+key 不存在 → 执行函数，存入并返回新值
+key 存在 → 直接返回旧值，不执行函数
+ 
+最常用：Map 里套 List/Set
+ 
+java
+  
+map.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
+ 
+ 
+一句话记：没有就新建，有就直接用
+ 
+ 
+ 
+2. computeIfPresent
+ 
+key 存在 → 执行函数，更新值
+key 不存在 → 啥也不干，返回 null
+ 
+适合：只对已存在的 key 做修改
+ 
+java
+  
+map.computeIfPresent("count", (k, oldVal) -> oldVal + 1);
+ 
+ 
+一句话记：有就改，没有拉倒
+ 
+ 
+ 
+3. merge
+ 
+最适合：计数、累加、合并
+ 
+规则：
+ 
+- key 不存在 → 直接放 defaultValue
+- key 存在 → 用  (oldVal, defaultValue) -> 新值  计算
+ 
+java
+  
+map.merge(key, 1, Integer::sum); // 计数+1
+ 
+ 
+等价于：
+ 
+java
+  
+if (不存在) put(key, 1)
+else put(key, old + 1)
+ 
+ 
+一句话记：没有就给默认值，有就合并计算
+ 
+ 
+ 
+超级对比（背这个）
+ 
+- computeIfAbsent：不存在 → 新建存入
+- computeIfPresent：存在 → 修改
+- merge：计数/累加神器，不存在=默认，存在=合并
+ 
+ 
+刷题万能模板（直接抄）
+java
+  
+// 1. 统计次数
+map.merge(key, 1, Integer::sum);
+
+// 2. 分组存列表
+map.computeIfAbsent(key, k -> new ArrayList<>()).add(val);
+
+// 3. 只修改已存在的值
+map.computeIfPresent(key, (k, v) -> v + 1);
+ 
