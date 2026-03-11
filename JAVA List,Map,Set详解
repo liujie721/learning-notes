@@ -1,0 +1,36 @@
+List
+List<Integer> ans=new ArrayList<>()
+List<Integer> ans=new LinkedList<>()
+ans.add()
+ans.get()
+ans.remove()
+ans.size()
+ans.contains()
+ans.isEmpty()
+
+Set
+Set<Integer> ans=new HashSet<>()
+Set<Integer> ans=new TreeSet<>()
+ans.add()
+ans.get()
+ans.remove()
+ans.size()
+ans.contains()
+ans.isEmpty()
+
+Map
+Map<Integer,Integer> ans=new HashMap<>()
+Map<Integer,Integer> ans=new TreeMap<>()
+put(K key, V value)	添加 / 修改键值对（键存在则覆盖值）	map.put("age", 20);
+get(Object key)	通过键获取值（键不存在返回 null）	int age = map.get("age");
+remove(Object key)	删除指定键的键值对	map.remove("age");
+containsKey(Object key)	判断是否包含某个键	boolean has = map.containsKey("age");
+containsValue(Object v)	判断是否包含某个值	boolean has = map.containsValue(20);
+size()	获取键值对个数	int len = map.size();
+isEmpty()	判断是否为空	boolean empty = map.isEmpty();
+clear()	清空所有键值对	map.clear();
+keySet()	获取所有键的 Set 集合	Set<String> keys = map.keySet();
+entrySet()	获取所有键值对的 Set 集合	Set<Map.Entry<String, Integer>> entries = map.entrySet();
+
+字符串获取长度 str.length()
+数组 ans.length;
