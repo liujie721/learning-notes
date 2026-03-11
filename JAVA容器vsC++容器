@@ -1,6 +1,6 @@
 Java 容器	     C++ 对应容器	              核心差异
 ArrayList	     vector	             底层都是动态数组，Java 自动扩容
-LinkedList	   list	                    都是双向链表
+LinkedList	    list	                    都是双向链表
 HashSet	       unordered_set	        都是哈希表，无序去重
 TreeSet	       set	                  都是红黑树，有序去重
 HashMap	       unordered_map	       都是哈希表，键值对无序
