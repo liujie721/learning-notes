@@ -1,0 +1,76 @@
+1.创建数据库 create database 数据库名
+
+2.创建时指定字符集：
+create database 数据库名
+default character set utf8mb4
+collate utf8mb4_unicode_ci;
+
+3.使用数据库：use 数据库名
+
+4.删除数据库：drop 数据库名
+
+5.查看已有数据库：show databases;
+
+6.建表：
+use 数据库名；
+create table 表名（
+字段1 类型 约束，
+字段2 类型 约束
+）
+字段：这一列的名字
+类型：存储类型  int  double(m,n);m（总位数）,n（小数点几位）；varchar(长度，可变)，char(长度，固定) ；data，datatime。
+约束： primary key (主键) ，not null(非空)，unique（唯一），default(默认)，auto_increment(自动增长)。
+
+7.主键：一张表里，用来唯一标识每一行数据的字段，就叫 主键。
+
+8.增：insert
+增加一个学生
+    insert into student(name, age, sex)
+    values('张三', 18, '男');
+删：delete
+-- 删除 id=1 的学生
+    delete from student
+    where id=1;
+改：update
+-- 把 id=1 的学生年龄改成 20
+    update student
+    set age=20
+    where id=1;
+查：select
+    select name, age from student;
+    select * from student where age=18;
+    select * from student;
+
+9.关键字：
+into：表示把数据插到哪个表    insert into student  → 把数据插到 student 表里
+values:后面写要添加的数据     values('张三',18,'男')
+from:表示从哪个表查、删、改   select * from student;  从student表查
+                            delete from student;    从student表删
+where:加条件（查谁、改谁、删谁） where id=1  → 只对 id=1 这一行有效
+set:修改时用，把字段改成新值   set age=20  → 把年龄改成20
+on:在… 基础上；根据…
+select:
+update:
+delete:
+and:并且
+or:或者
+like:模糊查询
+distinct:去重
+between...and...:在… 之间
+
+10.多表查询：从多张表中查询数据
+（1）内连接：
+select * 
+from student
+inner join class 
+on student.cid = class.cid;
+（2）左连接：左边全部显示
+select * 
+from student
+left join class 
+on student.cid = class.cid;
+
+join：连接
+on：按哪个字段连接（必须写！）
+inner join：只显示两边都有的
+left join：左边表全部显示
