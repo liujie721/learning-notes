@@ -1,0 +1,38 @@
+1.无参构造：避免不友好的初始状态，会自动生成无参构造
+2.有参构造：可以直接赋值，避免一个个用setter方法
+3.super：关键字，直接调用父类的方法，属性，构造。
+4.this：关键字，指向当前对象
+5.new:为对象分配内存，并调用构造方法初始化对象。
+6.封装：把类的属性私有化，只能通过方法进行访问
+7.访问器:获得属性的值
+8.修改器：修改属性值
+9.异常：Throwable:Error(错误，无法捕捉)，Exception（异常）（一切异常的父类）
+        Exception：NullPointerException 空指针，ArrayIndexOutOfBoundsException 数组越界，ArithmeticException 除零异常，IllegalArgumentException 参数不合法
+异常的处理格式：
+try{
+  //可能出现异常的语句
+}catch（异常类型 变量（随便写））{
+     // 出错了要干嘛
+}finally{
+  // 不管出不出错，一定会执行
+}
+finally：可写可不写
+throw:抛出，产生异常，制造错误不如其继续运行
+throws：我这方法可能报错，甩锅给调用者（可能有异常）
+10.重写equals,hashCode:
+ public boolean equals(Object o){
+        if(this==o){
+            return true;
+        }//this当前对象o比较对象
+        if(o==null||getClass()!=o.getClass()){
+            return false;
+        }
+        Student student = (Student) o;
+        return Objects.equals(this.id, student.id);
+    }
+
+    //hashCode重写,生成随机哈希值
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }                                      
