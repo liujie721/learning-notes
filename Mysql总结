@@ -78,7 +78,7 @@ GROUP BY
     teacher_id;  -- 按教师ID分组
 count():统计行数
 as：给列 / 表达式起别名
-group by:作用是按指定列分组
+group by:作用是按指定列分组,包含所有非聚合字段
 
 sum:聚合
 SUM(列名/表达式)  -- 对指定列的所有非NULL值求和
