@@ -55,6 +55,37 @@ delete:
 and:并且
 or:或者
 like:模糊查询
+
+limit：分页
+-- 方式1：仅限制行数（取前N行）
+SELECT ... LIMIT N;
+-- 方式2：指定起始位置（偏移量）+ 行数（通用分页写法）
+SELECT ... LIMIT 偏移量, 行数;
+-- 偏移量计算：(页码-1) * 每页行数（比如第2页、每页10条：偏移量=10）
+
+max,min:
+-- 求单列最大值
+SELECT MAX(列名) [AS 别名] FROM 表名 [WHERE 筛选条件];
+-- 求单列最小值
+SELECT MIN(列名) [AS 别名] FROM 表名 [WHERE 筛选条件];
+
+avg:求平均值
+SELECT AVG(列名) [AS 别名] FROM 表名 [WHERE 筛选条件] [GROUP BY 分组列];
+
+UNION 是用于合并多个 SELECT 查询结果集的关键字，它能将多个查询的结果纵向拼接成一个结果集返回。
+union
+union all
+select 列1, 列2 FROM 表1
+union [all]
+select 列1, 列2 FROM 表2;
+特性	     UNION	             UNION ALL
+重复行处理	自动去重（删除重复）	保留所有重复行
+性能	    较慢（需比对去重）	较快（无去重操作）
+         适用场景	需无重复结果	 允许重复 / 追求效率
+
+order by:对查询结果按指定列排序，实现有序展示
+降序必须加 DESC
+
 distinct:去重
 between...and...:在… 之间
 
