@@ -1,24 +1,93 @@
-一基础
 1.核心概念：
 SwingUtilities.invokeLater(() -> { // GUI 代码 });Swing代码在这个里面，可以防止程序卡死
 （1）
 顶层容器：
-JFrame:最常用的窗口（带标题栏、关闭按钮、最小化 / 最大化），是桌面应用的主窗口。
-JFrame frame=new JFrame("")
-方法：
-关闭窗口，终止整个程序：JFrame.EXIT_ON_CLOSE
-关闭窗口，只隐藏窗口：JFrame.HIDE_ON_CLOSE
-关闭窗口 → 销毁窗口:JFrame.DISPOSE_ON_CLOSE
-关闭窗口 → 无任何反应:JFrame.DO_NOTHING_ON_CLOSE
-设置宽度高度：frame.setSize()
-显示窗口：frame.setVisible()
-窗口居中：frame.etLocationRelativeTo(null)
-设置修改窗口标题：frame.setSize()
+   JFrame:最常用的窗口（带标题栏、关闭按钮、最小化 / 最大化），是桌面应用的主窗口。
+   JFrame frame=new JFrame("")
+   方法：
+   关闭窗口，终止整个程序：JFrame.EXIT_ON_CLOSE
+   关闭窗口，只隐藏窗口：JFrame.HIDE_ON_CLOSE
+   关闭窗口 → 销毁窗口:JFrame.DISPOSE_ON_CLOSE
+   关闭窗口 → 无任何反应:JFrame.DO_NOTHING_ON_CLOSE
+   设置宽度高度：frame.setSize()
+   显示窗口：frame.setVisible()
+   窗口居中：frame.etLocationRelativeTo(null)
+   设置修改窗口标题：frame.setTitle()
 
-JDialog：对话框（如提示框、确认框），依赖于 JFrame。
+
+   JDialog：对话框（如提示框、确认框），依赖于 JFrame。继承Dialog,大多数方法与JFrame同.JDialog 必须关联父窗口
+   方法：
+   构造方法(关联父窗口)：JDialog(JFrame parent):创建无标题、非模态的对话框，关联指定父窗口
+            JDialog(JFrame parent, String title):创建指定标题、非模态的对话框
+            JDialog(JFrame parent, String title, boolean modal):创建指定标题、指定模态的对话框（核心)
+   模态（modal）:true（模态）：对话框显示时，父窗口无法操作（阻塞父窗口，如系统提示框）；
+                 false（非模态）：对话框和父窗口可同时操作（如悬浮工具栏）。
+   Dialog.DISPOSE_ON_CLOSE：关闭时销毁对话框（释放资源，最常用）；
+   JDialog.HIDE_ON_CLOSE：仅隐藏对话框（默认值，对话框对象仍存在）；
+   JDialog.DO_NOTHING_ON_CLOSE：关闭按钮无效（需手动添加监听）；
+   JDialog.EXIT_ON_CLOSE：不推荐（对话框一般不用于退出整个应用）。
+   setTitle(String title):设置对话框标题
+   setSize(int width,int height):设置对话框大小
+   setDefaultCloseOperation(int operation)：设置关闭行为
+   setVisible(boolean):设置显示/隐藏对话框
+   getContentPane():获取内容面板
+   setResizable(boolean resizable)：设置是否可调整大小（默认 false）
+   setModal():动态设置对话框是否为模态
+   pack():自动调整对话框大小以适配内部组件（无需手动 setSize，推荐使用）
+   dispose():手动销毁对话框，释放资源
+   JDialog 核心是关联父窗口、设置模态 / 非模态、配置关闭行为，模态对话框阻塞父窗口，非模态不阻塞；
+   推荐使用 setLocationRelativeTo(parent) 让对话框相对父窗口居中，提升用户体验；
+   pack() 替代手动 setSize() 能自动适配组件大小，dispose() 可手动销毁对话框释放资源
+
 JApplet：用于浏览器的小程序（几乎不用）。
+
 （2）中间容器：用于组织组件，JPanel(面板)，JScrollPane(滚动面板)
 （3）基本组件：按钮，文本框，标签。如JButton,JTextFiel,JLable
+
+   JButton:（按钮）
+   构造方法：JButton btn = new JButton();无文本
+            JButton btn = new JButton("点击我");带文本
+           要有图片连接：
+            JButton btn = new JButton(new ImageIcon("icon.png"));创建带图标的按钮
+            JButton(String text, Icon icon) 创建带文本 + 图标的按钮
+   基础配置方法：
+            setText():动态修改按钮文本
+            getText():获取按钮当前文本
+            setEnabled(boolean b)：设置按钮是否可用（false 时灰显，无法点击）
+            setSize():设置按钮大小
+            setFont():设置按钮文本颜色
+            setBackground(Color c)：设置按钮背景色（部分外观风格下需手动开启）
+   按钮点击事件处理：
+     JButton btn = new JButton("Lambda 点击");
+     btn.addActionListener(e -> {
+         // 点击后执行的逻辑
+         JOptionPane.showMessageDialog(null, "按钮被点击了！");
+     });
+
+   JLabel:(静态文本/提示标签)
+         setText(String text)	动态设置 / 修改标签文本	label.setText("用户名：");
+         getText()	获取标签当前显示的文本	String tip = label.getText();
+         setFont(Font font)	设置标签文本字体（大小 / 样式 / 字体）	label.setFont(new Font("微软雅黑", Font.BOLD, 14));
+         setForeground(Color c)	设置文本颜色	label.setForeground(Color.RED); // 红色文本
+         setHorizontalAlignment(int align)	设置文本水平对齐（核心）	label.setHorizontalAlignment(SwingConstants.RIGHT); // 右对齐
+         setIcon(Icon icon)	设置标签显示的图标	label.setIcon(new ImageIcon("icon.png"));
+         setIconTextGap(int gap)	设置图标与文本的间距	label.setIconTextGap(8); // 间距 8 像素
+         setToolTipText(String text)	鼠标悬停时显示提示文字
+
+   JTextField:(单行文本输入框)
+         JTextField(int columns)	构造方法：设置输入框宽度（字符数）	new JTextField(15); // 可输入 15 个字符宽度
+         setText(String text)	设置输入框默认显示的文本	field.setText("admin"); // 默认填充 “admin”
+         getText()	获取用户输入的文本（核心）	String account = field.getText();
+         setEditable(boolean b)	设置输入框是否可编辑	field.setEditable(false); // 只读状态
+         setFont(Font font)	设置输入框文本字体	field.setFont(new Font("宋体", Font.PLAIN, 14));
+         setForeground(Color c)	设置输入文本颜色	field.setForeground(Color.BLACK);
+         setBackground(Color c)	设置输入框背景色	field.setBackground(Color.WHITE);
+         setBorder(Border border)	定制输入框边框（如圆角、颜色）	field.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+         setColumns(int columns)	动态修改输入框宽度（字符数）	field.setColumns(20);
+         setText("")	清空输入框内容（常用）	field.setText(""); // 登录失败后清空
+         requestFocus()	让输入框获取焦点（打开对话框后自动选中）	field.requestFocus();
+
+
  (4)事件处理：Swing 是「事件驱动」的，比如点击按钮触发 ActionEvent，需要通过「监听器」处理。
 核心事件类型：
 ActionEvent：按钮点击、菜单选择、回车触发（最常用）。
@@ -43,4 +112,16 @@ FlowLayout：流式布局（组件按添加顺序一行排，满了换行），�
 BorderLayout：边界布局（将容器分为东、南、西、北、中 5 个区域），默认 JFrame 的布局。
 GridLayout：网格布局（将容器分成等大的行列表格），适合登录框、表单。
 BoxLayout：盒子布局（垂直 / 水平排列），可精准控制组件间距。
-4.
+3.Container（容器）是 Swing/AWT 中所有「能容纳其他组件」的类的父类，
+是 GUI 组件布局和管理的核心。简单来说：Container 就是一个 “盒子”，专门用来装 JButton、JTextField、JLabel 等组件，
+并控制这些组件的排列方式。
+方法：
+    add(Component comp)	向容器添加组件（核心中的核心）	dialogPane.add(new JLabel("账号："));
+    add(Component comp, Object constraints)	带布局约束添加组件（如 BorderLayout 区域）	framePane.add(btn, BorderLayout.CENTER);
+    add(Component comp, int index)	指定索引位置添加组件（控制显示顺序）	dialogPane.add(cancelBtn, 4);
+    remove(Component comp)	移除指定组件	dialogPane.remove(accountField);
+    remove(int index)	移除指定索引的组件	dialogPane.remove(0); // 移除第一个组件
+    removeAll()	清空容器中所有组件	dialogPane.removeAll(); // 重置登录表单
+    getComponent(int index)	获取指定索引的组件	JTextField field = (JTextField) dialogPane.getComponent(1);
+    getComponents()	获取容器中所有组件（返回 Component []）	Component[] comps = dialogPane.getComponents();
+    getComponentCount()	获取容器中组件的数量	int count = dialogPane.getComponentCount();
