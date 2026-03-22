@@ -9,6 +9,7 @@ String password = "你的密码";
 Connection conn = DriverManager.getConnection(url, user, password);//DriverManager：JDBC 提供的驱动管理类，负责加载驱动并创建数据库连接
 （3）写 SQL 语句
 String sql = "INSERT INTO student(id,name,age) VALUES(?,?,?)";
+INSERT INTO 表名 (列名1, 列名2, ...) VALUES (占位符1, 占位符2, ...);
 （4）获取执行对象（PreparedStatement）
 PreparedStatement pstmt = conn.prepareStatement(sql);
 pstmt.setString(1, "001");
