@@ -16,6 +16,7 @@ pstmt.setString(1, "001");
 pstmt.setString(2, "张三");
 pstmt.setInt(3, 20);
 （5）执行 SQL（executeQuery / executeUpdate）
+int rows = pstmt.executeUpdate();：执行增删改 SQL，返回数据库受影响的行数（插入操作成功则为 1）；
 int rows = pstmt.executeUpdate();
 System.out.println("影响行数：" + rows);
 （6）关闭资源（rs、pstmt、conn）
