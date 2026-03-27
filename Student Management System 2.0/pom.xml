@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 项目基础坐标（可保留或微调） -->
+    <groupId>org.example</groupId>
+    <artifactId>StudentManagementSystem2.0</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <!-- 全局属性配置 -->
+    <properties>
+        <!-- Java 编译版本：根据本地 JDK 版本修改（8/11/17/24） -->
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 依赖版本统一管理（便于后续升级） -->
+        <mysql.version>8.0.33</mysql.version>
+        <hikari.version>5.0.1</hikari.version>
+        <lombok.version>1.18.30</lombok.version>
+        <junit.version>4.13.2</junit.version>
+    </properties>
+
+    <!-- 核心依赖（必须） -->
+    <dependencies>
+        <!-- 1. MySQL 驱动：连接 MySQL 数据库必备 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+            <scope>runtime</scope> <!-- 仅运行时需要，编译时不依赖 -->
+        </dependency>
+
+        <!-- 2. HikariCP 连接池：管理数据库连接（企业级标配） -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikari.version}</version>
+        </dependency>
+
+        <!-- 3. 可选：Lombok - 简化实体类（自动生成getter/setter） -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <optional>true</optional> <!-- 不传递依赖 -->
+        </dependency>
+
+        <!-- 4. 可选：JUnit - 单元测试（测试数据库操作） -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope> <!-- 仅测试时使用 -->
+        </dependency>
+    </dependencies>
+
+    <!-- 构建配置（可选，保证编译正常） -->
+    <build>
+        <plugins>
+            <!-- Maven 编译插件：确保 Java 版本编译正确 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
