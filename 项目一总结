@@ -1,0 +1,100 @@
+1.CSV文件：以逗号作为列的分割的纯文本文件。结尾.csv
+用二维字符串读取，须知道csv的文件地址。 
+filePath();
+File file =new File(filePath)//读取文件
+file.exists();         // 文件存在吗？
+file.isFile();         // 是文件吗？
+file.isDirectory();    // 是文件夹吗？
+file.getAbsolutePath();// 获取绝对路径
+file.getName();        // 获取文件名
+file.length();         // 文件大小
+file.createNewFile();  // 创建文件
+file.delete();         // 删除文件
+2.I/O流：输入，输出
+File：定位文件在哪
+流：传输数据的管道
+FileReader：连接文件
+BufferedReader：按行读取
+BufferedReader br = new BufferedReader(new FileReader("students.csv"));
+
+BufferedReader：读文本（CSV）最好用
+readLine()：读一行
+split(",")：切分列
+FileInputStream字节流：FileInputStream fis = new FileInputStream("文件路径");//读文本会乱码
+
+3.trim() ：用于去除字符串首尾的空白字符（空格、制表符\t、换行符\n等）
+
+4.读取CSV文件的步骤：1.找文件2.找流3.流中循环按行读取4.trim+分割5.检查CSV格式6.关流
+
+5.连接数据库：
+（1）配置信息
+    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";//MySQL 驱动的位置，固定写法
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/student_db";//数据库的地址，jdbc:mysql://localhost:3306/数据库名
+    private static final String DB_USER = "root";//用户名
+    private static final String DB_PASSWORD = "123456";//密码
+（2）让 Java 把 MySQL 驱动加载进内存，让程序认识 MySQL！
+    Class.forName(DB_DRIVER);
+（3）获取连接
+    public static Connection getConnection() {
+        try {
+            return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        } catch (SQLException e) {
+            throw new RuntimeException("连接失败");
+        }
+    }
+  
+6.如果常用的量，可以在一个类中定义
+往数据库中添加数据的格式：INSERT INTO 表名 (列1, 列2, 列3, ...) VALUES (值1, 值2, 值3, ...);
+
+String sql = "INSERT INTO 表名 (列1,列2,列3,...) VALUES (?,?,?,...)";//增
+String sql = "UPDATE student SET name=?, age=?, gender=?, major=?, phone=? WHERE id=?";//删
+String sql = "DELETE FROM student WHERE id = ?";//改
+String sql = "SELECT * FROM student WHERE id = ?";//查
+
+executeUpdate() → 执行增删改
+
+PreparedStatement 是 JDBC 里专门用来执行 SQL 语句的 “预编译执行器”
+
+作用：把 SQL 发给数据库，执行增删改查！
+Connection（连接）= 电话线
+PreparedStatement = 电话里的 “传话器”
+SQL 语句 = 你要说的话
+
+总结：Conection con=//获取连接
+      String sql=//获取命令
+      PreparedStatement ps=con.--(sql)//预编译
+      ps.executeUpdate() =//执行
+
+
+7.//重写equals,判断学号是否相同
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return Objects.equals(id, student.id);
+    }
+
+    //hashCode重写,生成随机哈希值
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+重写 equals ()：按学号判断是否是同一个学生
+重写 hashCode ()：保证学号相同，哈希值也相同
+目的：让集合、判断、去重功能正常工作！
+
+8.  Random random = new Random();//随机生成器
+
+9.JTextField 是 Java Swing 图形用户界面（GUI）工具包中的一个核心组件。是一个“单行输入框”。
+JTable 是 Java Swing 中用于展示和编辑表格数据的核心组件。自动重绘界面，显示新数据。
+
+10总结：
+
+视图层（View）	StudentManagementFrame、StudentTableModel、Main	提供可视化界面，接收用户操作（按钮点击 / 输入），展示数据（表格 / 弹窗），调用 Service 层
+业务层（Service）	StudentService（接口）、StudentServiceImpl	封装核心业务规则（校验、事务、逻辑判断），是 View 和 DAO 的中间层，统一处理业务异常
+数据访问层（DAO）	StudentDAO（接口）、StudentDAOImpl	仅负责数据库 CRUD 操作，不包含业务逻辑，提供数据库连接、SQL 执行、资源关闭能力
+工具层（Util）	DBUtil、CSVUtil、AiStudentTool	通用工具：数据库连接、CSV 解析、AI 辅助功能（生成 / 校验 / 分析）
+配置层（Config）	SystemConfig	统一管理常量（数据库配置、错误提示、CSV 格式），避免硬编码
+异常层（Exception）	StudentSystemException 及子类	自定义业务异常，分类处理不同错误场景（学号重复、导入失败、学生不存在等）
+实体层（Entity）	Student	封装学生数据（学号、姓名、年龄等），提供 get/set/equals/hashCode 等基础方法
