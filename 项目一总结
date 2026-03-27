@@ -66,6 +66,11 @@ SQL 语句 = 你要说的话
       ps.executeUpdate() =//执行
 
 
+关闭自动提交：conn.setAutoCommit(false)（开启事务）。
+执行一系列 SQL。
+提交：如果全部成功，调用 conn.commit()。
+回滚：如果中间出错，调用 conn.rollback()，将所有操作撤销。
+
 7.//重写equals,判断学号是否相同
     @Override
     public boolean equals(Object o) {
@@ -98,3 +103,39 @@ JTable 是 Java Swing 中用于展示和编辑表格数据的核心组件。自�
 配置层（Config）	SystemConfig	统一管理常量（数据库配置、错误提示、CSV 格式），避免硬编码
 异常层（Exception）	StudentSystemException 及子类	自定义业务异常，分类处理不同错误场景（学号重复、导入失败、学生不存在等）
 实体层（Entity）	Student	封装学生数据（学号、姓名、年龄等），提供 get/set/equals/hashCode 等基础方法
+
+掌握的部分：
+    （1）java的基础知识：封装，继承，多态，接口。重写/重载（equals/hashCode的重写）。异常处理。依赖。构造方法注入
+    （2）JDBC：加载驱动（DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)）
+               基本配置（驱动位置，数据库地址，用户名，密码）
+                将JAVA语句与数据库连起来（Conection con=，String sql=, PreparedStatement ps=con.--(sql), ps.executeUpdate()）
+                数据库事务，资源关闭。 closeResources(conn, pstmt, rs);
+    （3）CSV文件的读取，分割。File，I/O流的应用
+    （4）Swing的简单应用
+    （5）分层架构：表示层（API接口）->业务逻辑层->数据访问层。
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
