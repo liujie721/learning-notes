@@ -11,3 +11,4 @@
   SpringApplication.run(AiWorkorderServiceApplication.class, args)：启动 Spring Boot 项目！
   resources:项目的「配置 / 资源存放处」
   Spring boot的学习
+  Spring Ai的学习
