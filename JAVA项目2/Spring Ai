@@ -1,0 +1,93 @@
+1.概念：让项目接入大模型
+2.核心：ChatClient（Spring AI 提供的「AI 聊天工具类」帮你调用大模型（豆包、OpenAI、通义千问等），拿到 AI 回答）。
+所有 AI 功能都靠它，换模型只改配置，不改代码。
+3.配置格式
+spring:
+  ai:
+    openai:
+      api-key: sk-xxxxxxx
+      base-url: https://api.siliconflow.cn/v1  # 模型地址
+      chat:
+        options:
+          model: deepseek-ai/DeepSeek-V3
+          temperature: 0.7
+4.
+ChatClient → 官方类名
+.Builder → 官方内部类
+ChatClient.Builder → 完整固定名字，不能改！
+（1）基础注入：调用 AI 模型
+@Service
+public class AiService {
+    private final ChatClient chatClient;
+
+    public AiService(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+}
+（2）普通对话（问答、文案、总结）：接收用户的问题 → 发给 AI → 返回 AI 的答案
+public String chat(String prompt) {
+    return chatClient.prompt(prompt).call().content();// ChatClient不可改
+}
+（3）流式输出（打字机效果）：流式输出 = AI 一边想一边打字，像 ChatGPT 那样逐字返回
+public Flux<String> stream(String prompt) {
+    return chatClient.prompt(prompt).stream().content();
+}
+（4）结构化输出（AI 返回 Java 对象）：让 AI 自动把文字 → 变成 Java 对象
+record User(String name, Integer age) {}
+
+public User extract(String text) {
+    return chatClient
+        .prompt("提取姓名和年龄：" + text)
+        .call()
+        .entity(User.class);
+}
+
+5.系统角色（设定 AI 性格）：
+chatClient.prompt(
+    SystemMessage.from("你是暴躁客服，说话很冲"),
+    UserMessage.from("我的订单怎么没发")
+).call().content();
+
+带上下文（多轮对话）：
+List<Message> history = Arrays.asList(
+    new UserMessage("我叫张三"),
+    new AssistantMessage("好的张三")
+);
+
+chatClient.prompt(
+    new Prompt(history, new ChatOptions())
+).call().content();  
+
+6.Controller：项目的「大门 / 入口 / 前台」，别人想调用你的程序，必须经过 Controller！
+提供网址接口
+    比如：/ai/chat
+接收前端传过来的参数
+    比如用户发的消息：msg="你好"
+调用 Service，把结果返回给前端
+
+@RestController  // ① 标记这是接口类（大门）
+@RequestMapping("/ai")  // ② 所有接口统一前缀 /ai
+public class AiController {
+
+    @Autowired  // ③ 自动注入后台服务
+    private AiService aiService;
+
+    @GetMapping("/chat")  // ④ 普通问答接口
+    public String chat(String q) {
+        return aiService.chat(q);
+    }
+
+    @GetMapping(value = "/stream", produces = "text/stream")  // ⑤ 流式接口
+    public Flux<String> stream(String q) {
+        return aiService.stream(q);
+    }
+}
+
+7.总结：
+核心：ChatClient
+配置：api-key + base-url + model
+用法：
+普通：.prompt().call().content()
+流式：.prompt().stream().content()
+转对象：.entity(类.class)
+换模型 = 改 yml，代码不动
