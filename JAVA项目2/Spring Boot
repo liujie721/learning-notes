@@ -1,0 +1,159 @@
+1.Spring:管理Java对象，解耦代码，整合各种技术的容器（不用new对象，不用查找，构造，可以整合主流技术）=工厂+管家
+2.Spring核心作用：帮忙创建对象（ioc），自动把对象给我（di）。
+3.Spring使用：给类加注解，交给Spring管理。需要用时用@Autowired注入。启动Spring容器直接用
+常用注释:
+  -  @Component ：普通 Bean
+  
+  -  @Service ：业务层
+  
+  -  @Controller ：控制层（web）
+  
+  -  @Repository ：数据访问层
+  
+  -  @Configuration ：配置类
+  
+  -  @ComponentScan ：扫描包
+  
+  -  @Autowired ：自动注入。从容器拿出来
+  
+  -  @Bean ：手动注册对象.(管对象的)Service标记
+
+容器：存所有的Bean，启动时通过@ComponentScan 来扫描包，把标记Service ，Controller，Component构建成对象存起来
+4.Spring boot:Spring+自动配置+内置服务器+懒人开发包
+
+5.Spring Boot注解：
+
+    Spring Boot 核心注解（可直接复制）
+    一、启动类注解（1 个）
+    1. @SpringBootApplication
+    位置：主启动类上
+    作用：项目总开关，自动配置、自动扫描包
+    java
+    运行
+    @SpringBootApplication
+    public class Application {
+        public static void main(String[] args) {
+            SpringApplication.run(Application.class, args);
+        }
+    }
+    二、接口层注解（4 个）
+    2. @RestController
+    位置：类上
+    作用：标识这是接口控制器，接收前端请求
+    java
+    运行
+    @RestController
+    public class AiController { }
+    3. @GetMapping
+    作用：查询接口（GET 请求）
+    java
+    运行
+    @GetMapping("/hello")
+    public String hello() {
+        return "你好";
+    }
+    4. @PostMapping
+    作用：提交数据（新增、AI 问答、工单提交）
+    java
+    运行
+    @PostMapping("/ai/chat")
+    public String chat(String msg) {
+        return "AI回答";
+    }
+    5. @RequestMapping
+    作用：统一接口前缀
+    java
+    运行
+    @RequestMapping("/api")
+    @RestController
+    public class AiController { }
+    三、业务层注解（2 个）
+    6. @Service
+    位置：业务类上
+    作用：处理业务逻辑
+    java
+    运行
+    @Service
+    public class AiService { }
+    7. @Autowired
+    作用：自动注入对象（不用 new）
+    java
+    运行
+    @RestController
+    public class AiController {
+        @Autowired
+        private AiService aiService;
+    }
+    四、数据层（操作数据库）（2 个）
+    8. @Mapper
+    作用：数据库操作接口
+    java
+    运行
+    @Mapper
+    public interface WorkOrderMapper { }
+    9. @Select / @Insert / @Update / @Delete
+    作用：编写 SQL
+    java
+    运行
+    @Select("select * from work_order")
+    List<WorkOrder> list();
+    五、实体类（数据库表对应）（3 个）
+    10. @Data
+    作用：自动生成 getter、setter、toString
+    java
+    运行
+    @Data
+    public class User {
+        private Long id;
+        private String name;
+    }
+    11. @TableName
+    作用：对应数据库表名
+    java
+    运行
+    @TableName("user")
+    public class User { }
+    12. @TableId
+    作用：主键标识
+    java
+    运行
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    六、参数接收（前端传参）（3 个）
+    13. @RequestParam
+    作用：接收？name=xxx 形式参数
+    java
+    运行
+    @GetMapping("/test")
+    public String test(@RequestParam String name) { }
+    14. @RequestBody
+    作用：接收 JSON 参数（最常用）
+    java
+    运行
+    @PostMapping("/ai")
+    public String chat(@RequestBody String msg) { }
+    15. @PathVariable
+    作用：接收路径参数 /user/1
+    java
+    运行
+    @GetMapping("/user/{id}")
+    public User getById(@PathVariable Long id) { }
+
+6.SpringBoot步骤：
+    新建 SpringBoot 项目
+    启动类 @SpringBootApplication
+    写接口 @RestController + @GetMapping
+    写业务 @Service
+    注入使用 @Autowired
+    接收参数 @RequestParam / @PathVariable
+    返回 JSON
+
+总结;
+Spring 就是个对象容器：帮你 new 对象、帮你注入
+交给 Spring 管理：加注解 @Service、@RestController、@Mapper
+要用就注入：@Autowired
+写接口：@RestController + @GetMapping / @PostMapping
+写业务：@Service
+操作数据库：@Mapper + @Select / @Insert
+实体：@Data
+接收参数：@RequestParam、@PathVariable、@RequestBody
