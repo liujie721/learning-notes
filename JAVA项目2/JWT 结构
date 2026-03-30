@@ -31,6 +31,23 @@ role（admin/user）
 前端存储 JWT（localStorage/header）
 后续请求（提交工单、AI 问答）都带上 JWT
 后端拦截器验证 JWT，拿到用户 ID 和角色，做权限控制
+5.jwt思路:
+(1)依赖
+(2)固定配置:密钥(自己编),过期时间.
+(3)工具类
+生成 token(门票)
+    传入用户信息（userId、username 等）
+    设置过期时间
+    用密钥签名
+    返回一串 token 字符串
+解析 token
+    传入前端传过来的 token
+    用密钥验证签名
+    从中取出用户信息
+校验 token 是否有效
+    是否过期
+    格式是否正确
+    签名是否合法
 
 
 
