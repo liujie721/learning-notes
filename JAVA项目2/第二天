@@ -1,0 +1,13 @@
+用户表设计与JWT工具类
+学习的技术：
+  1. MySQL 表设计规范（字段类型、索引、主键）
+  2. JWT 结构（Header/Payload/Signature）与生成/验证原理
+  3. BCrypt 密码加密算法
+核心任务：
+  1. 设计并创建 `user` 表（含字段：id、username、password、role、createtime）
+  2. 实现 JWT 工具类与密码加密配置
+要写的类/方法：
+  - `User`（实体类，字段：id、username、password、role、createTime）
+  - `JwtUtil`（方法：`generateToken(String username)`、`getToken(String token)`、isToken(String token)`）
+  - `PasswordEncoder`（配置类，方法：`BCryptPasswordEncoder bCryptPasswordEncoder()`）
+
