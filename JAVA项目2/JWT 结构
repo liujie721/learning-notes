@@ -48,6 +48,41 @@ role（admin/user）
     是否过期
     格式是否正确
     签名是否合法
+6.生成token时:
+     SecretKey(JWT 加密用的 “安全钥匙”)   = Keys.hmacShaKeyFor(...)
+        把你的字符串密钥，变成 JWT 官方要求的安全密钥对象
+        → 不写就报错，新版 JJWT 强制要求。
+        expiration = 当前时间 + 有效期.System.currentTimeMillis()(作用：获取当前时间的时间戳（毫秒）)
+        计算 Token 什么时候过期
+        → 不写就永远zongj不过期，不安全。
 
+        builder() —— 开始构建 JWT
+        setSubject —— 存用户标识（username）
+        setIssuedAt —— 签发时间（现在）
+        setExpiration —— 过期时间（现在 + 有效时长）
+        signWith(key) —— 用密钥签名（安全核心）
+        compact() —— 生成最终的 JWT 字符串
+解析token:
+        获取密钥：必须与生成 Token 时使用的密钥完全一致。
+        获取 Token：通常是从 HTTP 请求头（Authorization）中获取，格式通常是 Bearer <token字符串>。
+        解析与验证：使用 Jwts.parserBuilder() 构建解析器，并指定密钥和签名算法。
+        捕获异常：这是关键。解析过程中可能会抛出异常（如 Token 过期 ExpiredJwtException、签名错误 SignatureException 等），必须进行捕获处理。
+        Claims(放用户数据的容器) claims = Jwts.parserBuilder()<创建一个 JWT 解析器>
+                .setSigningKey(getKey())  // 设置密钥
+                .build()                  // 构建解析器
+                .parseClaimsJws(token)    // 解析并校验token
+                .getBody();               // 获取数据体
 
-
+        return claims.getSubject(); // 取出用户名
+检验
+public boolean validateToken(String token) {
+    try {
+        Jwts.parserBuilder()
+            .setSigningKey(getKey()) // 放密钥
+            .build()
+            .parseClaimsJws(token);  // 解析 + 校验
+        return true;  // 没报错 = 有效
+    } catch (Exception e) {
+        return false; // 报错 = 无效
+    }
+}
