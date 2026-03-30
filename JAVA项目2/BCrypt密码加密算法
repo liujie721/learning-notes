@@ -1,0 +1,16 @@
+1.概念:专门用于密码加密的单向哈希算法.
+2.特点:不可逆,不可暴力破解,密文固定,只可对比.
+加盐 = 密码 + 随机串 一起加密
+自动加盐 = 你不用自己生成盐，BCrypt 帮你自动生成、自动存、自动用
+3.本项目中:
+  用户注册 → 密码 BCrypt 加密 → 存入数据库 user 表
+  用户登录 → 明文密码和密文比对 → 成功则登录
+4.方法
+加密：BCrypt.hashpw(明文, BCrypt.gensalt())
+比对：BCrypt.checkpw(明文, 密文)
+5.依赖
+<dependency>
+    <groupId>org.mindrot</groupId>
+    <artifactId>jbcrypt</artifactId>
+    <version>0.4</version>
+</dependency>
