@@ -1,0 +1,36 @@
+1.JWT:一段加密过的字符串，用来在前后端之间安全传递用户身份。
+2.登录成功 → 生成 JWT → 前端每次请求带上 JWT → 后端验证 JWT 合法 → 知道是谁在操作工单 / AI 问答。
+3.aaaaa.bbbbb.ccccc
+Header（头）.Payload（载荷，放数据）.Signature（签名 ）
+3.头部：说明类型，加密方式。
+    {
+      "alg": "HS256",   // 加密算法：HMAC-SHA256
+      "typ": "JWT"      // 类型就是 JWT
+    }
+
+载荷：放要传递的用户信息，不可传敏感信,公共的
+    sub：用户 ID
+    username：用户名
+    role：角色（admin/user）
+    iat：签发时间
+    exp：过期时间
+
+签名:这是 JWT 安全的核心，用来防篡改。
+    Signature = HMACSHA256(
+      Base64(Header) + "." + Base64(Payload),
+      密钥（secret）
+    )
+
+4.本项目中:
+用户登录：username + password
+后端查 user 表验证成功
+生成 JWT，放入：
+userId
+username
+role（admin/user）
+前端存储 JWT（localStorage/header）
+后续请求（提交工单、AI 问答）都带上 JWT
+后端拦截器验证 JWT，拿到用户 ID 和角色，做权限控制
+
+
+
