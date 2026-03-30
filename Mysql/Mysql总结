@@ -4,7 +4,8 @@
 create database 数据库名
 default character set utf8mb4
 collate utf8mb4_unicode_ci;
-
+    ENGINE=InnoDB:数据库存储引擎
+    default charset=utf8mb4:数据库字符集
 3.使用数据库：use 数据库名
 
 4.删除数据库：drop 数据库名
