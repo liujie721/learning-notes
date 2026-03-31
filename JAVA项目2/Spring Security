@@ -1,0 +1,194 @@
+1.概念：Spring 官方提供的、专门做「认证 + 授权 + 安全防护」的安全框架。
+作用：控制谁能进系统、能访问哪些接口、防止攻击。
+2.四大功能：
+（1）认证（Authentication）—— 你是谁？
+（2） 授权（Authorization）—— 你能做什么？
+（3）安全防护（攻防）
+（4）统一安全异常处理
+3.过滤器链：
+从 session 拿用户信息
+登录校验
+CSRF 校验
+异常捕获
+权限判断
+最终放行或拒绝
+4.核心组件：
+    认证（Authentication）：登录，确认你是谁
+    授权（Authorization）：判断你能访问什么
+    RBAC：用户 → 角色 → 权限
+    SecurityContextHolder：保存当前用户
+    Authentication：认证 Token（未认证 / 已认证）
+    UserDetails：用户实体
+    UserDetailsService：从数据库查用户（你要写）
+    PasswordEncoder：密码加密（BCrypt）
+    AuthenticationManager：真正做登录验证
+    SecurityFilterChain：安全配置类（总控制）
+    Filter 过滤器链：整个 Spring Security 的骨架，所有安全逻辑都在过滤器里执行。
+5.Spring Security 完整工作流程（极简版）
+请求 → 过滤器链
+SecurityContextPersistenceFilter 从 Session 读取用户
+登录请求走 UsernamePasswordAuthenticationFilter
+AuthenticationManager 认证
+认证成功 → 存入 SecurityContextHolder
+ExceptionTranslationFilter 捕获异常
+AuthorizationFilter 校验权限
+放行 / 拒绝
+chain.doFilter(request, response) —— 放行
+6.实际开发中，你用它做：
+    登录 / 登出
+    JWT 无状态认证
+    角色权限控制
+    接口细粒度权限
+    单点登录、OAuth2、微信登录
+    微服务安全体系
+7.Filter（请求进入后台的第一道关卡，所有请求必须先经过它。）
+public interface Filter {
+    // 初始化：项目启动时执行一次
+    void init(FilterConfig filterConfig);
+
+    // 核心：每次请求都会走这里
+    void doFilter(ServletRequest request, 
+                  ServletResponse response, 
+                  FilterChain chain);
+
+    // 销毁：项目关闭时执行
+    void destroy();
+}
+
+FilterChain（过滤器链）是 Servlet 规范中的核心机制，
+用于将多个 Filter 按顺序连接起来，形成一个处理流水线。
+每个请求/响应都会通过这个链传递，每个 Filter 都有机会处理请求和响应。
+8.登录认证（账号密码 + JWT）
+token 校验（每次请求都验）
+接口放行 / 拦截（白名单）
+角色 / 权限控制（admin/user）
+401/403 统一返回 JSON
+
+9.套用模板：
+（1）pom依赖库
+（2）JWT工具类
+（3）JWT过滤器：
+      @Override
+      protected void doFilterInternal(
+          HttpServletRequest request,
+          HttpServletResponse response,
+          FilterChain chain) throws ServletException, IOException {
+      
+          // 1. 从请求头拿到 token
+          String token = request.getHeader("Authorization");
+      
+          // 2. 如果没有 token，直接放行
+          if (token == null || !token.startsWith("Bearer ")) {
+              chain.doFilter(request, response);
+              return;
+          }
+      
+          // 3. 解析 token，拿到用户名
+          String username = jwtUtil.getUsernameFromToken(token);
+      
+          // 4. 如果 token 有效 → 把用户信息放入 Spring 上下文
+          if (username != null && 认证信息为空) {
+              UserDetails user = userDetailsService.loadUserByUsername(username);
+              把 user 放入 SecurityContextHolder
+          }
+      
+          // 5. 放行 → 进入接口
+          chain.doFilter(request, response);
+      }
+（4）Security 配置类（项目总开关）
+（5）查数据库用户（你必须自己写的类）
+（6）登录接口（Controller）
+（7）权限注解（最常用）
+
+10自定义过滤器只有 2 种写法（掌握这 2 个足够）
+  继承 OncePerRequestFilter（企业 90% 用这个）
+      import jakarta.servlet.FilterChain;
+      import jakarta.servlet.ServletException;
+      import jakarta.servlet.http.HttpServletRequest;
+      import jakarta.servlet.http.HttpServletResponse;
+      import org.springframework.web.filter.OncePerRequestFilter;
+      import java.io.IOException;
+      
+      public class MyCustomFilter extends OncePerRequestFilter {
+      
+          @Override
+          protected void doFilterInternal(
+                  HttpServletRequest request,
+                  HttpServletResponse response,
+                  FilterChain filterChain
+          ) throws ServletException, IOException {
+      
+              // ======================
+              // 1. 请求前逻辑（写这里）
+              // ======================
+              System.out.println("自定义过滤器执行前");
+      
+              String uri = request.getRequestURI();
+              String token = request.getHeader("Authorization");
+      
+              // ======================
+              // 2. 放行（必须写）
+              // ======================
+              filterChain.doFilter(request, response);
+      
+              // ======================
+              // 3. 响应后逻辑（很少用）
+              // ======================
+              System.out.println("自定义过滤器执行后");
+          }
+      }
+  实现 Filter 接口（原始 Servlet 方式）
+        import jakarta.servlet.*;
+        import jakarta.servlet.http.HttpServletRequest;
+        import jakarta.servlet.http.HttpServletResponse;
+        import java.io.IOException;
+        
+        public class MyFilter implements Filter {
+        
+            @Override
+            public void doFilter(
+                    ServletRequest request,
+                    ServletResponse response,
+                    FilterChain chain
+            ) throws IOException, ServletException {
+        
+                // 必须强转
+                HttpServletRequest req = (HttpServletRequest) request;
+                HttpServletResponse resp = (HttpServletResponse) response;
+        
+                // 逻辑...
+                System.out.println("原生 Filter 执行");
+        
+                // 放行
+                chain.doFilter(request, response);
+            }
+        }
+
+
+11.HttpServletRequest是 Java Servlet API 中的核心接口，代表客户端的 HTTP 请求。
+当客户端（如浏览器）向服务器发送 HTTP 请求时，Servlet 容器（如 Tomcat）会创建一个 HttpServletRequest对象，
+封装所有请求信息，并传递给对应的 Servlet 进行处理。
+12UserDetailsService = 去数据库查用户的工具
+作用：根据用户名，把用户查出来交给 Spring Security 做登录校验
+UserDetails loadUserByUsername(String username)：据用户名，去数据库查出用户，返回给 Spring Security 做登录验证
+13.
+    // ==============================================
+    // 核心方法：每次前端请求接口，都会执行这个方法！
+    // ==============================================
+    @Override  // 重写父类的方法
+    protected void doFilterInternal(
+            HttpServletRequest request,   // 请求对象：拿请求头、参数
+            HttpServletResponse response, // 响应对象
+            FilterChain chain             // 过滤器链：放行用
+    ) throws ServletException, IOException {
+
+        // ====================== 1. 从请求头里拿 token ======================
+        // 前端传过来的格式：Bearer xxxxxxx.token.xxxxxxx
+        String header = request.getHeader("Authorization");
+
+        // ====================== 2. 如果没有 token，直接放行 ======================
+        // 没有token → 不处理，直接交给后面的Security去判断（会返回401）
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(request, response); // 放行
+            return; // 直接结束，不往下走了
+        }
