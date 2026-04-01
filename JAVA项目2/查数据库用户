@@ -40,3 +40,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 2.UserMapper = 数据库查询用户的工具（MyBatis 接口）
 作用：根据用户名，去数据库查用户信息
 
+
+ User 是：Spring Security 自带的官方工具类！
+User.withUsername("test")  // 账号
+    .password("xxx")       // 加密密码
+    .roles("USER")         // 角色
+    .build();              // 生成 UserDetails
+
+
+new BCryptPasswordEncoder()
+创建一个密码加密工具
+Spring 官方最安全的加密器
+ .encode(...)
+调用加密方法
+把密码丢进去 → 出来就是密文
+"123456"
+你要加密的原文密码
