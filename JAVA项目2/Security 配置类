@@ -1,0 +1,188 @@
+1.
+/**
+ * Spring Security 核心配置类（项目安全总开关）
+ * 1. 放行接口配置
+ * 2. 认证/授权规则配置
+ * 3. 跨域、会话、CSRF配置
+ * 4. 密码加密器配置
+ */
+@Configuration
+@EnableWebSecurity // 开启Spring Security安全配置
+public class SecurityConfig {
+
+    /**
+     * 核心过滤器链配置（总控所有安全规则）
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // 1. 关闭CSRF防护（前后端分离项目必须关闭）
+                .csrf(csrf -> csrf.disable())
+
+                // 2. 跨域配置（启用自定义跨域规则）
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // 3. 会话管理（前后端分离使用TOKEN，禁用Session）
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // 4. 权限拦截规则配置（核心！）
+                .authorizeHttpRequests(auth -> auth
+                        // 放行白名单接口（无需登录即可访问）
+                        .requestMatchers(
+                                "/user/login",        // 登录接口
+                                "/user/register",     // 注册接口
+                                "/captcha/**",        // 验证码接口
+                                "/swagger-ui/**",     // Swagger文档
+                                "/v3/api-docs/**",    // OpenAPI接口文档
+                                "/doc.html"           // Knife4j文档
+                        ).permitAll()
+
+                        // 管理员接口：需要 ADMIN 权限
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // 普通用户接口：需要 USER 权限
+                        .requestMatchers("/user/**").hasRole("USER")
+
+                        // 所有请求：必须登录认证后才能访问
+                        .anyRequest().authenticated()
+                );
+
+        // 如果需要自定义登录页/登录成功/失败处理器，在这里扩展
+        // http.formLogin(form -> form.loginPage("/login").permitAll());
+
+        return http.build();
+    }
+
+    /**
+     * 跨域配置（前后端分离必备）
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        // 允许的前端域名（生产环境改为具体域名）
+        config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:3000"));
+        // 允许的请求方式
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // 允许的请求头
+        config.setAllowedHeaders(Arrays.asList("*"));
+        // 允许携带Cookie
+        config.setAllowCredentials(true);
+        // 预检请求有效期
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    /**
+     * 密码加密器（Spring Security强制要求）
+     * 注册/登录密码加密、校验统一使用这个Bean
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+2.
+ SecurityFilterChain securityFilterChain(HttpSecurity http)：定义项目所有请求的安全规则：谁能进、谁不能进、哪里放行、哪里要登录
+http —— Spring Security 配置的总控制台
+http
+    .csrf(...)          // CSRF 开关
+    .cors(...)          // 跨域开关
+    .sessionManagement(...) // 会话管理（Token/ Session）
+    .authorizeHttpRequests(...) // 权限拦截核心（白名单、权限控制）
+    .formLogin(...)     // 登录配置
+    .logout(...)        // 登出配置
+    .exceptionHandling(...) // 异常处理（未登录、无权限）
+关闭 CSRF（前后端分离必写）：http.csrf(csrf -> csrf.disable())
+开启跨域：http.cors(cors -> cors.configurationSource())
+会话管理（项目不用 Session，用 Token）：.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+权限拦截（最重要！）
+      http.authorizeHttpRequests(auth -> auth
+          .requestMatchers("/login", "/register").permitAll()  // 白名单
+          .requestMatchers("/admin/**").hasRole("ADMIN")       // 管理员权限
+          .anyRequest().authenticated()                        // 其他必须登录
+      );
+.requestMatchers("/xxx/**").permitAll()	放行白名单，不用登录
+.anyRequest().authenticated()	所有请求必须登录
+.requestMatchers("/admin/**").hasRole("ADMIN")	必须是管理员
+.requestMatchers("/test/**").hasAnyRole("ADMIN","USER")	满足任意角色即可
+
+
+最后调用 .build() 生成 安全过滤器链：return http.build();
+3.@Bean
+public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+}
+把 Spring Security 内置的登录管理器 暴露出来，让你自己可以在 Service/Controller 里手动调用登录！
+4.
+ /**
+     * 跨域配置（前后端分离必备）
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        // 允许的前端域名（生产环境改为具体域名）
+        config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:3000"));
+        // 允许的请求方式
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // 允许的请求头
+        config.setAllowedHeaders(Arrays.asList("*"));
+        // 允许携带Cookie
+        config.setAllowCredentials(true);
+        // 预检请求有效期
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    /**
+     * 密码加密器（Spring Security强制要求）
+     * 注册/登录密码加密、校验统一使用这个Bean
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+CorsConfiguration = 跨域规则的配置对象（你所有允许谁访问、允许什么请求、允许带什么，全都存在这个对象里）
+
+CorsConfiguration = 跨域规则的 “配置实体类
+  setAllowedOrigins(...)：允许哪些来源域名访问（前端地址）
+  setAllowedMethods(...)：允许哪些请求方法
+  setAllowedHeaders(...)：允许哪些请求头（放 Token 必须用）
+  setAllowCredentials(true)：是否允许携带 Cookie/Authorization
+  setMaxAge(3600L)：预检请求（OPTIONS）缓存时间
+
+//把你写好的跨域规则，绑定到项目的所有接口上，让跨域配置真正生效！
+UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();//一个存放跨域规则的盒子
+source.registerCorsConfiguration("/**", config);
+
+//Spring Security 必写的密码加密工具
+//PasswordEncoder：密码加密
+//BCryptPasswordEncoder = Spring Security 官方推荐、最安全、不可逆、自动加盐的密码加密器。
+  public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
