@@ -1,0 +1,42 @@
+1.
+
+/**
+ * 用户登录认证服务实现类
+ * 作用：从数据库查询用户信息，交给 Spring Security 校验
+ */
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    // 注入你的 UserMapper / UserDao
+    @Resource
+    private UserMapper userMapper;
+
+    /**
+     * 根据用户名查询用户（登录时自动调用）
+     * @param username 前端传的用户名
+     * @return UserDetails（Security 需要的用户对象）
+     * @throws UsernameNotFoundException 找不到用户抛出异常
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // 1. 根据用户名去数据库查用户
+        User user = userMapper.selectByUsername(username);
+
+        // 2. 如果用户不存在，抛出异常
+        if (user == null) {
+            throw new UsernameNotFoundException("用户名不存在！");
+        }
+
+        // 3. 返回 Security 标准的 UserDetails 对象
+        // 传入：用户名、数据库加密密码、权限集合
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword()) // 数据库里的 BCrypt 加密密码
+                .authorities("ROLE_USER")    // 角色（ROLE_ 前缀必须写）
+                .build();
+    }
+}
+
+2.UserMapper = 数据库查询用户的工具（MyBatis 接口）
+作用：根据用户名，去数据库查用户信息
+
