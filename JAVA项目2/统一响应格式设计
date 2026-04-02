@@ -1,0 +1,101 @@
+Result = 标准快递盒
+1.Result<T>：统一响应格式
+Result.success()：成功
+Result.success(data)：成功带数据
+Result.fail(msg)：失败带提示
+所有接口统一返回 Result，前端最舒服
+2.固定格式的JSON
+code：响应码（200 = 成功，500 = 失败）
+msg：提示信息（“成功”“失败”“用户名错误”）
+data：真实数据（对象、列表、null）
+success：是否成功（可选）
+    {
+      "code": 200,
+      "msg": "操作成功",
+      "data": {
+        "id": 1,
+        "name": "张三"
+      },
+      "success": true
+    }
+3.import lombok.Data;
+
+@Data // 自动生成get、set、toString
+public class Result<T> {
+
+    private Integer code;   // 响应码
+    private String msg;     // 提示信息
+    private T data;         // 数据
+    private boolean success;// 是否成功
+
+    // 成功（无数据）
+    public static <T> Result<T> success() {
+        Result<T> r = new Result<>();
+        r.setCode(200);
+        r.setMsg("操作成功");
+        r.setSuccess(true);
+        return r;
+    }
+
+    // 成功（带数据）
+    public static <T> Result<T> success(T data) {
+        Result<T> r = new Result<>();
+        r.setCode(200);
+        r.setMsg("操作成功");
+        r.setData(data);
+        r.setSuccess(true);
+        return r;
+    }
+
+    // 失败
+    public static <T> Result<T> fail(String msg) {
+        Result<T> r = new Result<>();
+        r.setCode(500);
+        r.setMsg(msg);
+        r.setSuccess(false);
+        return r;
+    }
+
+    // 自定义失败码
+    public static <T> Result<T> fail(Integer code, String msg) {
+        Result<T> r = new Result<>();
+        r.setCode(code);
+        r.setMsg(msg);
+        r.setSuccess(false);
+        return r;
+    }
+}
+
+4.@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    // 查询（GET 带数据）
+    @GetMapping("/{id}")
+    public Result<User> getById(@PathVariable Integer id) {
+        User user = new User();
+        user.setId(id);
+        user.setName("张三");
+        return Result.success(user); // 成功+数据
+    }
+
+    // 新增
+    @PostMapping
+    public Result<User> add(@RequestBody User user) {
+        // 保存逻辑...
+        return Result.success(); // 成功无数据
+    }
+
+    // 修改
+    @PutMapping
+    public Result<User> update(@RequestBody User user) {
+        return Result.success();
+    }
+
+    // 删除
+    @DeleteMapping("/{id}")
+    public Result<User> delete(@PathVariable Integer id) {
+        // 删除失败示例
+        return Result.fail("删除失败，用户不存在");
+    }
+}
