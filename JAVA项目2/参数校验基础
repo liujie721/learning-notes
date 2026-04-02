@@ -1,0 +1,26 @@
+1.参数校验 = 后端检查前端传过来的数据对不对、合不合法。
+2.常用校验注解
+@NotBlank：字符串不能为 null、空、全空格
+@NotNull：不能为 null（数字、对象用）
+@Min：最小值
+@Max：最大值
+@Length：字符串长度
+@Email：邮箱格式
+public class User {
+
+    @NotBlank(message = "用户名不能为空")
+    private String username;
+
+    @NotNull(message = "年龄不能为空")
+    @Min(value = 1, message = "年龄必须大于0")
+    @Max(value = 150, message = "年龄不合理")
+    private Integer age;
+
+    @Email(message = "邮箱格式不正确")
+    private String email;
+}
+3.Controller 开启校验
+@PostMapping("/user")
+public Result add(@RequestBody @Valid User user) { // 加 @Valid
+    return Result.ok();
+}
