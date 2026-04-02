@@ -1,0 +1,12 @@
+Spring Security 集成
+需学习的技术
+  1. Spring Security 过滤器链工作流程
+  2. 认证（Authentication）与授权（Authorization）概念
+  3. 自定义过滤器的实现方式
+核心任务
+  1. 配置 Spring Security，放行登录/注册接口
+  2. 实现 JWT 登录过滤器，拦截请求验证 Token
+要写的类/方法：
+ SecurityConfig`（配置类，方法：`SecurityFilterChain filterChain(HttpSecurity http)`、`AuthenticationManager authenticationManager(AuthenticationConfiguration config)`）
+ JwtAuthenticationFilter`（过滤器类，方法：`doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)`）
+  UserDetailsServiceImpl`（实现 UserDetailsService，方法：`UserDetails loadUserByUsername(String username)`）
