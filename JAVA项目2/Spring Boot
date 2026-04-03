@@ -2,7 +2,7 @@
 2.Spring核心作用：帮忙创建对象（ioc），自动把对象给我（di）。
 3.Spring使用：给类加注解，交给Spring管理。需要用时用@Autowired注入。启动Spring容器直接用
 常用注释:
-  -  @Component ：普通 Bean
+  -  @Component ：普通 Bean。
   
   -  @Service ：业务层
   
