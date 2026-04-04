@@ -9,7 +9,7 @@
 加密：BCrypt.hashpw(明文, BCrypt.gensalt())
 比对：BCrypt.checkpw(明文, 密文)
 5.依赖
-<dependency>
+<dependency>。
     <groupId>org.mindrot</groupId>
     <artifactId>jbcrypt</artifactId>
     <version>0.4</version>
