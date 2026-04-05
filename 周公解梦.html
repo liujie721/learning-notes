@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周公解梦 - AI智能梦境解析</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: "Noto Sans SC", sans-serif;
+  background: linear-gradient(135deg, #1A0B2E 0%, #1A0B2E 100%);
+  color: #fff;
+  min-height: 100vh;
+  padding-bottom: 20px;
+}
+.bg-stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.3;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.title {
+  font-family: "Noto Serif SC", serif;
+  text-align: center;
+  font-size: 28px;
+  margin: 20px 0;
+  color: #FFD7A8;
+}
+.subtitle {
+  text-align: center;
+  color: #B8A8C8;
+  margin-bottom: 30px;
+}
+
+/* 选择界面 */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 60px;
+}
+.welcome-btn {
+  height: 60px;
+  border-radius: 16px;
+  font-size: 18px;
+  border: none;
+  background: #C9A961;
+  color: #1A0B2E;
+  font-weight: bold;
+  cursor: pointer;
+}
+.welcome-btn.secondary {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid #5A3D7A;
+}
+
+.search-box {
+  width: 100%;
+  height: 44px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid #5A3D7A;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 15px;
+  color: #fff;
+  outline: none;
+  margin-bottom: 12px;
+}
+.search-box::placeholder { color: #B8A8C8; }
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.filter-tab {
+  flex: 1;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.07);
+  border: none;
+  color: #B8A8C8;
+  font-size: 14px;
+  cursor: pointer;
+}
+.filter-tab.active {
+  background: #C9A961;
+  color: #1A0B2E;
+}
+
+.dream-input {
+  width: 100%;
+  height: 260px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid #5A3D7A;
+  border-radius: 16px;
+  padding: 16px;
+  font-size: 16px;
+  color: #fff;
+  resize: none;
+  outline: none;
+  backdrop-filter: blur(10px);
+}
+.dream-input::placeholder { color: #B8A8C8; }
+.word-count {
+  text-align: right;
+  color: #B8A8C8;
+  font-size: 12px;
+  margin: 6px 0;
+}
+.btn-analyze {
+  width: 100%;
+  height: 50px;
+  background: #C9A961;
+  color: #1A0B2E;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.btn-analyze:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+.btn-analyze:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: 0 0 12px #C9A961;
+}
+.loading-box {
+  text-align: center;
+  padding: 40px 20px;
+  display: none;
+}
+.loading-text {
+  margin-top: 20px;
+  color: #C9A961;
+}
+.result-box {
+  display: none;
+  margin-top: 24px;
+}
+.card {
+  background: rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid #5A3D7A;
+}
+.card h3 {
+  color: #FFD7A8;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+.card p {
+  line-height: 1.8;
+  color: #E6E6E6;
+  font-size: 15px;
+  margin-bottom: 6px;
+  white-space: pre-line;
+}
+.action-bar {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.btn {
+  flex: 1;
+  height: 46px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+}
+.btn-primary { background: #C9A961; color: #111; }
+.btn-secondary { background: #5A3D7A; color: #fff; }
+.btn-danger { background: #a12f2f; color: #fff; }
+
+.my-dreams, .dream-detail, .dream-page { display: none; }
+.dream-item {
+  background: rgba(255,255,255,0.07);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.dream-item:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.dream-item .title {
+  font-size: 16px;
+  text-align: left;
+  margin: 0 0 6px 0;
+}
+.dream-item .info {
+  font-size: 12px;
+  color: #B8A8C8;
+  display: flex;
+  justify-content: space-between;
+}
+.tag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.tag.ji { background: #4CAF7A; color: #fff; }
+.tag.ping { background: #999; color: #fff; }
+.tag.xiong { background: #e53935; color: #fff; }
+
+.empty-tip {
+  text-align: center;
+  padding: 60px 20px;
+  color: #B8A8C8;
+}
+.blessing {
+  text-align: center;
+  color: #FFD7A8;
+  font-weight: 500;
+  margin: 10px 0 20px;
+  font-size: 15px;
+}
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4CAF7A;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: none;
+  z-index: 999;
+}
+.back-btn {
+  width: 100%;
+  height: 44px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #5A3D7A;
+  color: #fff;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<div class="bg-stars"></div>
+
+<!-- 选择界面 -->
+<div id="welcome" class="container">
+  <h1 class="title">周公解梦</h1>
+  <p class="subtitle">AI智能解析 · 传统解梦 · 心理分析</p>
+  <div class="welcome">
+    <button class="welcome-btn" onclick="goDream()">开始解梦</button>
+    <button class="welcome-btn secondary" onclick="goMy()">查看我的梦境</button>
+  </div>
+</div>
+
+<!-- 解梦页面 -->
+<div id="dream-page" class="container dream-page">
+  <button class="back-btn" onclick="goBack()">← 返回首页</button>
+  <h1 class="title">AI解梦</h1>
+  <textarea class="dream-input" id="dreamContent" placeholder="请详细描述您的梦境，越详细解析越准确...&#10;例如：我梦见自己在天空飞翔，心情很轻松"></textarea>
+  <div class="word-count" id="wordCount">0/2000</div>
+  <button class="btn-analyze" id="startBtn">开始解梦</button>
+
+  <div class="loading-box" id="loading">
+    <div>⏳ 正在解析梦境...</div>
+    <div class="loading-text">AI思考中...</div>
+  </div>
+
+  <div class="result-box" id="result">
+    <div class="card"><h3>🌙 梦境含义</h3><p id="res-meaning"></p></div>
+    <div class="card"><h3>🧠 心理分析</h3><p id="res-psycho"></p></div>
+    <div class="card"><h3>💡 行动建议</h3><p id="res-suggest"></p></div>
+    <div class="blessing" id="res-bless"></div>
+    <div class="action-bar">
+      <button class="btn btn-primary" id="saveBtn">保存梦境</button>
+      <button class="btn btn-secondary" id="shareBtn">分享解析</button>
+      <button class="btn btn-secondary" id="againBtn">重置</button>
+    </div>
+  </div>
+</div>
+
+<!-- 我的梦境 -->
+<div id="my-page" class="container my-dreams">
+  <button class="back-btn" onclick="goBack()">← 返回首页</button>
+  <h1 class="title">我的梦境</h1>
+  <input class="search-box" id="searchInput" placeholder="搜索梦境内容..." oninput="doSearch()">
+  <div class="filter-tabs">
+    <button class="filter-tab active" data-type="all">全部</button>
+    <button class="filter-tab" data-type="ji">吉梦</button>
+    <button class="filter-tab" data-type="ping">平梦</button>
+    <button class="filter-tab" data-type="xiong">凶梦</button>
+  </div>
+  <div id="dreamList"></div>
+  <div class="empty-tip" id="emptyTip">暂无保存的梦境</div>
+</div>
+
+<!-- 详情 -->
+<div id="detail-page" class="container dream-detail">
+  <button class="back-btn" onclick="goMy()">← 返回列表</button>
+  <h1 class="title">梦境详情</h1>
+  <div class="card"><h3>📝 梦境描述</h3><p id="detailContent"></p></div>
+  <div class="card"><h3>🌙 梦境含义</h3><p id="detailMeaning"></p></div>
+  <div class="card"><h3>🧠 心理分析</h3><p id="detailPsycho"></p></div>
+  <div class="card"><h3>💡 行动建议</h3><p id="detailSuggest"></p></div>
+  <div class="blessing" id="detailBless"></div>
+  <div class="action-bar">
+    <button class="btn btn-secondary" id="shareDetailBtn">分享</button>
+    <button class="btn btn-danger" id="delBtn">删除</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let currentDreamId = null;
+let filterType = 'all';
+let searchKeyword = '';
+
+// 页面路由
+function show(id) {
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('dream-page').style.display = 'none';
+  document.getElementById('my-page').style.display = 'none';
+  document.getElementById('detail-page').style.display = 'none';
+  document.getElementById(id).style.display = 'block';
+}
+function goBack() { show('welcome') }
+function goDream() { show('dream-page') }
+function goMy() { show('my-page'); renderDreamList() }
+function goDetail() { show('detail-page') }
+
+// 筛选
+document.querySelectorAll('.filter-tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    filterType = tab.dataset.type;
+    renderDreamList();
+  };
+});
+
+// 搜索
+function doSearch() {
+  searchKeyword = document.getElementById('searchInput').value.trim().toLowerCase();
+  renderDreamList();
+}
+
+// 字数统计
+const dreamInput = document.getElementById('dreamContent');
+const wordCount = document.getElementById('wordCount');
+dreamInput.addEventListener('input', () => {
+  const len = dreamInput.value.length;
+  wordCount.textContent = len + '/2000';
+});
+
+// ===================== 【精准吉凶分类库】 =====================
+const JI = ['飞','飞翔','太阳','阳光','彩虹','龙','凤凰','鱼','清水','金子','捡钱','发财','棺材','升官','死人','尸体','见血','大火','花开','结婚','生子','登高','坐船','笑','开心','顺利','贵人','神仙','菩萨','丰收','金银','珠宝','明月','星星','上山','回家','干净','香','温暖'];
+const XIONG = ['坠落','掉牙','流血','被杀','追杀','鬼','妖怪','地狱','黑暗','迷路','吵架','打架','抢劫','偷盗','生病','受伤','痛苦','哭泣','洪水','地震','倒塌','破碎','肮脏','蛇咬','狗咬','失业','失败','丢东西','坐牢','受伤','死亡','灾难','疼痛','紧张','害怕'];
+const GOOD = ['开心','轻松','愉快','幸福','顺利','自由','舒服','安心'];
+const BAD = ['害怕','恐惧','紧张','焦虑','痛苦','难过','绝望','不安'];
+
+function classifyDream(text) {
+  let t = text.toLowerCase();
+  if (JI.some(i => t.includes(i))) return 'ji';
+  if (XIONG.some(i => t.includes(i))) return 'xiong';
+  if (GOOD.some(i => t.includes(i))) return 'ji';
+  if (BAD.some(i => t.includes(i))) return 'xiong';
+  return 'ping';
+}
+
+// ===================== 强制10字限制 + 精准分类AI =====================
+document.getElementById('startBtn').onclick = async () => {
+  const text = dreamInput.value.trim();
+  
+  if (text.length < 10) {
+    showToast("请输入至少10个字描述梦境", "#ff4444");
+    return;
+  }
+
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+
+  const localLuck = classifyDream(text);
+
+  const prompt = `
+你是专业周公解梦大师+心理咨询师，严格按格式输出，不要多余内容：
+
+【传统解梦】依据周公解梦
+【现代心理学】分析内心
+心理分析：简洁总结
+行动建议：1. 2. 3. 4.
+美好祝福：吉利温暖
+吉凶：ji/ping/xiong
+
+梦境：${text}
+`;
+
+  try {
+    const res = await fetch("https://api.siliconflow.cn/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer sk-vcincrwwohimiuthlvpyfxtsvzwgctpyoorbkihnujlyzgku"
+      },
+      body: JSON.stringify({
+        model: "Qwen/Qwen2.5-7B-Instruct",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7
+      })
+    });
+    const data = await res.json();
+    const ans = data.choices[0].message.content;
+
+    const t1 = ans.match(/【传统解梦】([\s\S]*?)(?=\n【|$)/)?.[1] || "";
+    const t2 = ans.match(/【现代心理学】([\s\S]*?)(?=\n心理|$)/)?.[1] || "";
+    const psycho = ans.match(/心理分析：([\s\S]*?)(?=\n行动|$)/)?.[1] || "";
+    const suggest = ans.match(/行动建议：([\s\S]*?)(?=\n美好|$)/)?.[1] || "";
+    const blessing = ans.match(/美好祝福：([\s\S]*?)(?=\n吉凶|$)/)?.[1] || "";
+    const luck = ans.match(/吉凶：\s*(\w+)/)?.[1] || localLuck;
+
+    document.getElementById('res-meaning').innerText = `【传统解梦】${t1}\n\n【现代心理学】${t2}`;
+    document.getElementById('res-psycho').innerText = psycho;
+    document.getElementById('res-suggest').innerText = suggest;
+    document.getElementById('res-bless').innerText = blessing;
+    window.currentLuck = ['ji','xiong','ping'].includes(luck) ? luck : localLuck;
+  } catch (e) {
+    console.error(e);
+    showToast("AI服务暂时不可用，本地精准解析", "#ff9800");
+    
+    const t = text.toLowerCase();
+    let m,p,s,b,l=localLuck;
+
+    if(l === 'ji'){
+      m="此为吉梦，运势上升，喜事将近，贵人相助，财源广进。";
+      p="你内心积极，能量充足，潜意识正在迎接好运与成长。";
+      s="1.把握机会，大胆行动\n2.保持乐观，广结善缘\n3.提升自我，迎接好运\n4.多行善事，福运加倍";
+      b="✨吉星高照，万事顺遂，所愿皆成！";
+    } else if(l === 'xiong'){
+      m="此为警示梦，提醒你近期谨言慎行，防小人，避是非，保平安。";
+      p="你近期压力较大，内心焦虑，潜意识发出预警信号。";
+      s="1.低调处事，避免争执\n2.注意安全，保护自己\n3.舒缓压力，规律作息\n4.静心修身，化解不利";
+      b="✨逢凶化吉，平安无恙，一切转顺！";
+    } else {
+      m="此为平梦，生活安稳，心态平和，无吉无凶，顺其自然。";
+      p="情绪稳定，内心平静，生活按部就班，安稳舒适。";
+      s="1.保持规律作息\n2.放松心情，享受生活\n3.多与亲友沟通\n4.稳步前行，静待花开";
+      b="✨平安喜乐，万事顺心，健康如意！";
+    }
+
+    document.getElementById('res-meaning').innerText = m;
+    document.getElementById('res-psycho').innerText = p;
+    document.getElementById('res-suggest').innerText = s;
+    document.getElementById('res-bless').innerText = b;
+    window.currentLuck = l;
+  }
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+};
+
+// 保存
+document.getElementById('saveBtn').onclick = () => {
+  const item = {
+    id: Date.now(),
+    content: dreamInput.value,
+    meaning: document.getElementById('res-meaning').innerText,
+    psycho: document.getElementById('res-psycho').innerText,
+    suggest: document.getElementById('res-suggest').innerText,
+    blessing: document.getElementById('res-bless').innerText,
+    luck: window.currentLuck || 'ping',
+    time: new Date().toLocaleString()
+  };
+  let list = JSON.parse(localStorage.getItem('dreams') || '[]');
+  list.unshift(item);
+  localStorage.setItem('dreams', JSON.stringify(list));
+  showToast('保存成功 ✅');
+};
+
+// 渲染列表
+function renderDreamList(){
+  let list = JSON.parse(localStorage.getItem('dreams') || '[]');
+  const box = document.getElementById('dreamList');
+  const empty = document.getElementById('emptyTip');
+  list = list.filter(item => {
+    const matchSearch = !searchKeyword || item.content.toLowerCase().includes(searchKeyword);
+    const matchFilter = filterType === 'all' || item.luck === filterType;
+    return matchSearch && matchFilter;
+  });
+  if (list.length === 0) { box.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  box.innerHTML = list.map(item => `
+    <div class="dream-item" onclick="openDetail(${item.id})">
+      <div class="title">${item.content.substring(0,25)}${item.content.length>25?'...':''}</div>
+      <div class="info">
+        <span>${item.time}</span>
+        <span class="tag ${item.luck}">${item.luck=='ji'?'吉梦':item.luck=='ping'?'平梦':'凶梦'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 打开详情
+function openDetail(id){
+  const list = JSON.parse(localStorage.getItem('dreams') || '[]');
+  const item = list.find(i => i.id === id);
+  if (!item) return;
+  currentDreamId = id;
+  document.getElementById('detailContent').innerText = item.content;
+  document.getElementById('detailMeaning').innerText = item.meaning;
+  document.getElementById('detailPsycho').innerText = item.psycho;
+  document.getElementById('detailSuggest').innerText = item.suggest;
+  document.getElementById('detailBless').innerText = item.blessing;
+  goDetail();
+}
+
+// 分享
+document.getElementById('shareBtn').onclick = () => {
+  const txt = `【梦境】${dreamInput.value}\n\n${document.getElementById('res-meaning').innerText}\n\n${document.getElementById('res-psycho').innerText}\n\n${document.getElementById('res-suggest').innerText}\n\n${document.getElementById('res-bless').innerText}`;
+  navigator.clipboard.writeText(txt).then(() => showToast('已复制'));
+};
+document.getElementById('shareDetailBtn').onclick = () => {
+  const item = JSON.parse(localStorage.getItem('dreams')).find(i => i.id === currentDreamId);
+  const txt = `【梦境】${item.content}\n\n${item.meaning}\n\n${item.psycho}\n\n${item.suggest}\n\n${item.blessing}`;
+  navigator.clipboard.writeText(txt).then(() => showToast('已复制'));
+};
+
+// 删除
+document.getElementById('delBtn').onclick = () => {
+  let list = JSON.parse(localStorage.getItem('dreams') || '[]');
+  list = list.filter(i => i.id !== currentDreamId);
+  localStorage.setItem('dreams', JSON.stringify(list));
+  showToast('删除成功');
+  goMy();
+};
+
+// 重置
+document.getElementById('againBtn').onclick = () => {
+  dreamInput.value = '';
+  wordCount.textContent = '0/2000';
+  document.getElementById('result').style.display = 'none';
+};
+
+// 提示
+function showToast(msg, color='#4CAF7A') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2000);
+}
+
+// 初始化
+show('welcome');
+</script>
+</body>
+</html>
