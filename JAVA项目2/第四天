@@ -1,0 +1,13 @@
+用户注册登录接口
+- 需学习的技术：
+  1. Spring MVC 常用注解（`@RestController`、`@PostMapping`、`@RequestParam`、`@RequestBody`）
+  2. 统一响应格式设计（Result 类）
+  3. 参数校验基础（后续第15天深入）
+- 核心任务：
+  1. 定义统一响应类 `Result`
+  2. 实现用户注册（校验用户名唯一性、密码加密）、登录（验证密码、生成JWT）接口
+- 要写的类/方法：
+  Result<T>（统一响应类，字段：code、message、data）
+  UserService（方法：`Result<String> register(User user)`、`Result<String> login(String username, String password)`）
+  AuthController`（接口：`@PostMapping("/api/auth/register")`、`@PostMapping("/api/auth/login")`）
+
