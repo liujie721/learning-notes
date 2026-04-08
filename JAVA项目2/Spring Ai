@@ -91,3 +91,25 @@ public class AiController {
 流式：.prompt().stream().content()
 转对象：.entity(类.class)
 换模型 = 改 yml，代码不动
+Prompt = 发给 AI 的完整请求（系统提示 + 问题 + 参数）
+
+1. 创建一个标准 Prompt（系统提示 + 用户问题）
+// 系统提示：设定AI是工单助手
+Message systemMessage = new SystemMessage("你是智能工单助手，负责分类、摘要、判断优先级");
+
+// 用户问题：工单内容
+Message userMessage = new UserMessage("工单内容：登录系统一直报错500");
+
+// 构建 Prompt
+Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
+
+2.交给 ChatClient 发送
+ChatResponse response = chatClient.call(prompt);
+String result = response.getResult().getOutput().getContent();
+
+简化：
+chatClient.prompt()
+          .system("...")
+          .user("...")
+          .call()
+          .content();
