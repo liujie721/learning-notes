@@ -156,8 +156,28 @@ select *
 from student
 left join class 
 on student.cid = class.cid;
-
 join：连接
 on：按哪个字段连接（必须写！）
 inner join：只显示两边都有的
 left join：左边表全部显示
+
+
+11.CROSS JOIN = 笛卡尔积 = 全部两两配对
+
+ROUND (数字，保留几位小数)
+→ 四舍五入
+
+NULL = 没数据
+IFNULL (值，0) = 没数据就显示 0
+
+AVG = 平均值 = 总和 ÷ 个数
+公式：
+AVG (字段) = SUM (字段) / COUNT (字段)
+
+GROUP BY 项目 ID = 把数据按项目分开，各自算自己的 SUM 和 COUNT
+
+ROUP BY = 分组 → 把 “相同内容” 放一堆，每堆单独算。
+先分类
+再每类单独计算（sum、avg、count、max、min）
+一句话：
+先分组，再聚合。
