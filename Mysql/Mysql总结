@@ -181,3 +181,16 @@ ROUP BY = 分组 → 把 “相同内容” 放一堆，每堆单独算。
 再每类单独计算（sum、avg、count、max、min）
 一句话：
 先分组，再聚合。
+
+12.模糊查询：
+SELECT * FROM knowledge 
+WHERE title LIKE '%Java%';
+
+-- 包含 "Java"
+title LIKE '%Java%'
+
+-- 以 "Java" 开头
+title LIKE 'Java%'
+
+-- 以 "Java" 结尾
+title LIKE '%Java'
