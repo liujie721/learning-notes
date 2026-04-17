@@ -5,7 +5,7 @@ ans.add()
 ans.get()
 ans.remove()
 ans.size()
-ans.contains()
+ans.contains()5
 ans.isEmpty()
 
 1
