@@ -144,7 +144,25 @@ REGEXP高级版模糊查询
 逗号（,）：是「分隔符」，用于同一语法结构下的多个并列元素（字段、分组字段、插入值等），CASE WHEN 子句内无逗号；
 分号（;）：是「终止符」，仅放在整条 SQL 语句的最后，语句中间（如函数、CASE END 内）绝对不能加；
 
+LEFT(name, 1)：取第一个字符
+UPPER(...)：转大写
+SUBSTRING(name, 2)：从第 2 位开始取后面所有
+LOWER(...)：转小写
+CONCAT(...)：拼起来
 
+regexp \\b = 单词边界
+只要出现 DIAB1 作为一个单词开头 就匹配，最简单。
+
+
+like
+    DIAB1% → 以 DIAB1 开头的所有内容
+    %DIAB1 → 以 DIAB1 结尾
+    %DIAB1% → 包含 DIAB1
+
+
+delete a//删除这一行
+from Person a,Person b
+where a.email=b.email and a.id>b.id;
 10.多表查询：从多张表中查询数据
 （1）内连接：
 select * 
